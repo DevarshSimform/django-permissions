@@ -13,7 +13,7 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <form method="POST" action="{% url 'groups' %}" id="group-form">
+            <form method="POST" action="{% url 'groups' %}">
                 {% csrf_token %}
                 
                 <label for="user">Select User</label>
@@ -30,8 +30,9 @@
                 <br>
             
                 <label for="group">Select Group</label>
-                <select class="form-select" name="group" required onchange="document.getElementById('group-form').submit()">
+                <select class="form-select" name="group" required>
                     <option selected disabled>Select</option>
+                    <option value="checker_flag">checker_flag</option>
                     {% for group in groups %}
                         <option value="{{ group.id }}">{{ group.name }}</option>
                     {% empty %}

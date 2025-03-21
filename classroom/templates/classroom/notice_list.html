@@ -21,7 +21,9 @@
                     <small class="text-muted">Posted by: {{ notice.author }}</small>
                     <div>
                         <a href="{% url 'notice_update' notice.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                        <a href="{% url 'notice_delete' notice.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% if perms.classroom.delete_notice %}
+                            <a href="{% url 'notice_delete' notice.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
