@@ -1,0 +1,49 @@
+{% extends "classroom/base.html" %}
+
+{% block title %}Group{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Group</h2>
+        {% comment %} {% if user.is_authenticated %}
+            <a href="{% url 'group_create' %}" class="btn btn-primary">Create Group</a>
+        {% endif %} {% endcomment %}
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" action="{% url 'groups' %}" id="group-form">
+                {% csrf_token %}
+                
+                <label for="user">Select User</label>
+                <select class="form-select" name="user" required>
+                    <option selected disabled>Select</option>
+                    {% for user in users %}
+                        {% if not user.is_superuser and user != request.user %}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endif %}
+                    {% empty %}
+                    <p class="text-center">No users available.</p>
+                    {% endfor %}
+                </select>
+                <br>
+            
+                <label for="group">Select Group</label>
+                <select class="form-select" name="group" required onchange="document.getElementById('group-form').submit()">
+                    <option selected disabled>Select</option>
+                    {% for group in groups %}
+                        <option value="{{ group.id }}">{{ group.name }}</option>
+                    {% empty %}
+                    <p class="text-center">No groups available.</p>
+                    {% endfor %}
+                </select>
+                <br>
+            
+                <button type="submit" class="btn btn-primary">Join Group</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
