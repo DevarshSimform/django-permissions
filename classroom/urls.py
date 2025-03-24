@@ -14,4 +14,6 @@ urlpatterns = [
     path('group/', views.groups, name='groups'),
     path('assign/', views.assign_notice, name='assign_notice'),
     
+
+    # path('test/', views.file_response, name='test'),
 ]

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponsePermanentRedirect
 from .forms import UserRegisterForm, NoticeForm
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import Notice
@@ -31,6 +31,7 @@ def assign_notice(request):
             assign_perm('classroom.change_notice', user, notice)
         else:
             remove_perm('classroom.change_notice', user, notice)
+        return render('notice_list')
 
 
     users = User.objects.all()
@@ -99,7 +100,8 @@ def groups(request):
         }
         return render(request, 'classroom/group.html', content)
     else:
-        return redirect('notice_list')
+        # return redirect('notice_list')
+        return redirect("notice_list", permanent=True)
 
 
 def register(request):
@@ -110,4 +112,16 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(request, 'classroom/register.html', {'form': form})
+
+
+
+# Implemented custom file response
+
+# from django.http import FileResponse
+
+# def file_response(request):
+#     file_path = '/home/devarsh.chhatrala@simform.dom/Desktop/django-permissions-classroom/classroom/test.pdf'
+#     response = FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+#     response['content Disposition'] = 'attachment; filename=download.pdf'
+#     return response
 

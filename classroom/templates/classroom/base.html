@@ -14,9 +14,9 @@
         <div class="container">
             <a class="navbar-brand" href="#">Notice Board</a>
             <a class="navbar-brand" href="{% url "notice_list" %}">All Notice</a>
-            {% if request.user.is_superuser or request.user|in_group:'DB_admin' %}
+            {% comment %} {% if request.user.is_superuser or request.user|in_group:'DB_admin' %} {% endcomment %}
                 <a class="navbar-brand" href="{% url "groups" %}">change Group</a>
-            {% endif %}
+            {% comment %} {% endif %} {% endcomment %}
             <a class="navbar-brand" href="{% url "assign_notice" %}">Assign to</a>
 
 
