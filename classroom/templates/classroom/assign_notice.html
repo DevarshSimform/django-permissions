@@ -1,0 +1,51 @@
+{% extends "classroom/base.html" %}
+{% load filter_group %}
+
+{% block title %} Assign {% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">        
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" action="{% url 'assign_notice' %}">
+                {% csrf_token %} 
+
+                <label for="notice">Select notice</label>
+                <select class="form-select" name="notice" required>
+                    <option selected disabled>Select</option>
+                    {% for notice in notices %}
+                        <option value="{{ notice.id }}">{{ notice.title }}</option>
+                    {% empty %}
+                    <p class="text-center">No notice available.</p>
+                    {% endfor %}
+                </select>
+                <br>
+
+                <label for="user">Select User</label>
+                <select class="form-select" name="user" required>
+                    <option selected disabled>Select</option>
+                    {% for user in users %}
+                        {% if not user.is_superuser and user != request.user and not user|in_group:'DB_admin'%}
+                            <option value="{{ user.id }}">{{ user.username }}</option>
+                        {% endif %}
+                    {% empty %}
+                    <p class="text-center">No notice available.</p>
+                    {% endfor %}
+                </select>
+                <br>
+                
+                <label for="action">Select Action</label>
+                <select class="form-select" name="action" required>
+                    <option selected disabled>Select</option>
+                    <option value="assign">Assign</option>
+                    <option value="deassign">Deassign</option>    
+                </select>
+                <br>
+                <button type="submit" class="btn btn-primary">Assign</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

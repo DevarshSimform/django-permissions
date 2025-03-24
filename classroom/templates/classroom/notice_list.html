@@ -1,4 +1,6 @@
 {% extends "classroom/base.html" %}
+{% load filter_group %}
+{% load guardian_tags %}
 
 {% block title %}Notice List{% endblock %}
 
@@ -20,9 +22,21 @@
                 <div class="d-flex justify-content-between">
                     <small class="text-muted">Posted by: {{ notice.author }}</small>
                     <div>
-                        <a href="{% url 'notice_update' notice.id %}" class="btn btn-sm btn-secondary">Edit</a>
-                        {% if perms.classroom.delete_notice %}
-                            <a href="{% url 'notice_delete' notice.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% if request.user|in_group:'Student' %}
+                            {% get_obj_perms request.user for notice as "notice_perms" %}
+                            {% if "change_notice" in notice_perms %}
+                                <a href="{% url 'notice_update' notice.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                            {% endif %}
+                            {% if "delete_notice" in notice_perms %}
+                                <a href="{% url 'notice_delete' notice.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            {% endif %}
+                        {% else %}
+                            {% if perms.classroom.change_notice %}
+                                <a href="{% url 'notice_update' notice.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                            {% endif %}
+                            {% if perms.classroom.delete_notice %}
+                                <a href="{% url 'notice_delete' notice.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

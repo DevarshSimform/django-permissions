@@ -32,7 +32,6 @@
                 <label for="group">Select Group</label>
                 <select class="form-select" name="group" required>
                     <option selected disabled>Select</option>
-                    <option value="checker_flag">checker_flag</option>
                     {% for group in groups %}
                         <option value="{{ group.id }}">{{ group.name }}</option>
                     {% empty %}

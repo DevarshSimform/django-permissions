@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User, Permission, Group
 from django.core.exceptions import PermissionDenied
 from .utils import object_permission_required
+from guardian.shortcuts import assign_perm, remove_perm
 
 
 def home(request):
@@ -14,8 +15,31 @@ def home(request):
 
 @login_required
 def notice_list(request):
-    notices = Notice.objects.all()
+    notices = Notice.objects.order_by('-date_posted')
     return render(request, 'classroom/notice_list.html', {'notices': notices})
+
+
+@login_required
+def assign_notice(request):
+    if request.method == 'POST':
+        notice_id = request.POST.get('notice')
+        user_id = request.POST.get('user')
+        is_assign = request.POST.get('action')
+        notice = Notice.objects.get(id=notice_id)
+        user = User.objects.get(id=user_id)
+        if is_assign == 'assign':
+            assign_perm('classroom.change_notice', user, notice)
+        else:
+            remove_perm('classroom.change_notice', user, notice)
+
+
+    users = User.objects.all()
+    notices = Notice.objects.filter(author = request.user)
+    content = {
+            'users': users, 
+            'notices': notices
+        }
+    return render(request, 'classroom/assign_notice.html', content)
 
 
 @permission_required('classroom.add_notice', raise_exception=True)
@@ -37,17 +61,13 @@ def notice_create(request):
 def notice_update(request, pk):
     notice = Notice.objects.get(pk=pk)
 
-
     if request.method == 'POST':
         form = NoticeForm(request.POST, instance=notice)
         if form.is_valid():
             form.save()
             return redirect('notice_list')
     else:
-        if notice.author == request.user or request.user.has_perm('classroom.change_notice'):
-            form = NoticeForm(instance=notice)
-        else:
-            return redirect('notice_list')
+        form = NoticeForm(instance=notice)
     return render(request, 'classroom/notice_update.html', {'form': form})
 
 
@@ -63,17 +83,11 @@ def groups(request):
     if request.method == 'POST':
         user_id = request.POST.get('user')
         group_id = request.POST.get('group')
-        if group_id != "checker_flag":
-            user = User.objects.get(pk=user_id)
-            new_group = Group.objects.get(pk=group_id)
-            user.groups.clear()
-            user.groups.add(new_group)
-        else:
-            user = User.objects.get(pk=user_id)
-            user.user_permissions.clear()
-            permission_can_edit = Permission.objects.get(codename='view_notice')
-            user.user_permissions.add(permission_can_edit)
-            print(user.has_perm('view_notice'))
+
+        user = User.objects.get(pk=user_id)
+        new_group = Group.objects.get(pk=group_id)
+        user.groups.clear()
+        user.groups.add(new_group)
 
 
     if request.user.groups.filter(name='DB_admin').exists() or request.user.is_superuser:

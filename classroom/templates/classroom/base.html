@@ -1,3 +1,4 @@
+{% load filter_group %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,9 +14,11 @@
         <div class="container">
             <a class="navbar-brand" href="#">Notice Board</a>
             <a class="navbar-brand" href="{% url "notice_list" %}">All Notice</a>
-            {% if True %}
-                <a class="navbar-brand" href="{% url "groups" %}">Groups</a>
+            {% if request.user.is_superuser or request.user|in_group:'DB_admin' %}
+                <a class="navbar-brand" href="{% url "groups" %}">change Group</a>
             {% endif %}
+            <a class="navbar-brand" href="{% url "assign_notice" %}">Assign to</a>
+
 
             <div class="ms-auto">
                 {% if user.is_authenticated %}
@@ -23,7 +26,7 @@
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
-                    </form>                    
+                    </form>
                 {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Login</a>
                 {% endif %}
