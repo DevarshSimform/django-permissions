@@ -12,13 +12,14 @@
 
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="#">Notice Board</a>
-            <a class="navbar-brand" href="{% url "notice_list" %}">All Notice</a>
-            {% comment %} {% if request.user.is_superuser or request.user|in_group:'DB_admin' %} {% endcomment %}
-                <a class="navbar-brand" href="{% url "groups" %}">change Group</a>
-            {% comment %} {% endif %} {% endcomment %}
-            <a class="navbar-brand" href="{% url "assign_notice" %}">Assign to</a>
-
+            {% if user.is_authenticated %}
+                <a class="navbar-brand" href="#">Notice Board</a>
+                <a class="navbar-brand" href="{% url "notice_list" %}">All Notice</a>
+                {% comment %} {% if request.user.is_superuser or request.user|in_group:'DB_admin' %} {% endcomment %}
+                    <a class="navbar-brand" href="{% url "groups" %}">change Group</a>
+                {% comment %} {% endif %} {% endcomment %}
+                <a class="navbar-brand" href="{% url "assign_notice" %}">Assign to</a>
+            {% endif %}
 
             <div class="ms-auto">
                 {% if user.is_authenticated %}

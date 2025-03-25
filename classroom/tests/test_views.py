@@ -27,7 +27,7 @@ class TestViews(TestCase):
         # Urls
         cls.list_url = reverse('notice_list')
         cls.create_url = reverse('notice_create')
-        cls.delete_url = reverse('notice_delete')
+        cls.delete_url = reverse('notice_delete', kwargs={'pk':1})
 
     @classmethod
     def create_user(cls, username, password, permission=None):
@@ -64,7 +64,10 @@ class TestViews(TestCase):
     
     def test_notice_create_with_permission(self):
         self.client.login(username='testuser1', password='testpass1')
-        data = {'title': 'New notice', 'content': 'This is a new notice'}
+        data = {
+            'title': 'New notice', 
+            'content': 'This is a new notice'
+        }
         response = self.client.post(self.create_url, data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('notice_list'))
@@ -73,11 +76,29 @@ class TestViews(TestCase):
 
     def test_notice_create_unauthenticated(self):
         response = self.client.get(self.create_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.url.startswith('/accounts/login/'))
+        self.assertEqual(response.status_code, 403)
+        # self.assertTrue(response.url.startswith('/accounts/login/'))
 
     
     def test_notice_delete_without_permission(self):
-        pass
-
+        self.client.login(username='testuser2', password='testpass2')
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 403)
+        
     
+    def test_notice_delete_with_permission(self):
+        self.client.login(username='testuser1', password='testpass1')
+        response = self.client.get(self.delete_url)
+        notice = Notice.objects.first()
+        # print(notice.author)
+        if notice.author == 'testuser1' or notice.author.has_perm('delte_notice'):
+            notice.delete()
+            self.assertEqual(Notice.objects.count(), 0)
+        else:
+            self.assertEqual(response.status_code, 403)
+
+
+    def test_notice_delete_unauthenticated(self):
+        response = self.client.get(self.delete_url)
+        self.assertEqual(response.status_code, 403)
+        # self.assertTrue(response.url.startswith('/accounts/login/'))

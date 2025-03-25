@@ -13,7 +13,7 @@ def home(request):
     return render(request, 'classroom/base.html')
 
 
-@login_required
+# @login_required
 def notice_list(request):
     notices = Notice.objects.order_by('-date_posted')
     return render(request, 'classroom/notice_list.html', {'notices': notices})
@@ -31,15 +31,14 @@ def assign_notice(request):
             assign_perm('classroom.change_notice', user, notice)
         else:
             remove_perm('classroom.change_notice', user, notice)
-        return render('notice_list')
-
-
-    users = User.objects.all()
-    notices = Notice.objects.filter(author = request.user)
-    content = {
-            'users': users, 
-            'notices': notices
-        }
+        return redirect('notice_list')
+    else:
+        users = User.objects.all()
+        notices = Notice.objects.filter(author = request.user)
+        content = {
+                'users': users, 
+                'notices': notices
+            }
     return render(request, 'classroom/assign_notice.html', content)
 
 
